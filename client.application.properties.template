@@ -1,6 +1,6 @@
-spring.application.name=movie-catalog-service
-eureka.client.serviceUrl.defaultZone=https://200408173336-discovery-server.azurewebsites.net:443/eureka
-eureka.instance.hostname=200408173336-${spring.application.name}.azurewebsites.net
+spring.application.name=SERVICE_NAME
+eureka.client.serviceUrl.defaultZone=https://TIMESTAMP-discovery-server.azurewebsites.net:443/eureka
+eureka.instance.hostname=TIMESTAMP-${spring.application.name}.azurewebsites.net
 eureka.instance.secure-port-enabled=true
 eureka.instance.nonsecure-port-enabled=false
 eureka.instance.nonSecurePort=80

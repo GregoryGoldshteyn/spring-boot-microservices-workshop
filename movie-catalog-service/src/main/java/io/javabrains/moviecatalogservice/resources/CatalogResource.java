@@ -17,8 +17,15 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 @RestController
-@RequestMapping("/catalog")
+@RequestMapping("/")
 public class CatalogResource {
+
+    @RequestMapping("/")
+    public String getServiceInfo(){
+        return "Movie catalog service is up!\n" +
+        "User ratings and movie info by user can be requested on the path /catalog/{userId}\n" +
+        "NOTE: ensure that the discovery server, ratings data service, and movie info service have been visited before making requests to the catalog resource";
+    }
 
     @Autowired
     private RestTemplate restTemplate;
@@ -26,7 +33,7 @@ public class CatalogResource {
     @Autowired
     WebClient.Builder webClientBuilder;
 
-    @RequestMapping("/{userId}")
+    @RequestMapping("/catalog/{userId}")
     public List<CatalogItem> getCatalog(@PathVariable("userId") String userId) {
 
         UserRating userRating = restTemplate.getForObject("http://ratings-data-service/ratingsdata/user/" + userId, UserRating.class);

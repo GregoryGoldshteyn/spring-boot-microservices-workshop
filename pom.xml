@@ -12,11 +12,20 @@
     <!-- Project Name / Description -->
     <name>Spring Boot Microservices Example Project</name>
     <description>Parent project for all modules</description>
+    <!-- Inherit from springboot -->
+    <parent>
+		<groupId>org.springframework.boot</groupId>
+		<artifactId>spring-boot-starter-parent</artifactId>
+		<version>2.1.2.RELEASE</version>
+		<relativePath/>
+	</parent>
     <!-- Properties -->
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <maven.compiler.source>1.8</maven.compiler.source>
         <maven.compiler.target>1.8</maven.compiler.target>
+        <timestamp>${maven.build.timestamp}</timestamp>
+        <maven.build.timestamp.format>YYddMMHHmmss</maven.build.timestamp.format>
     </properties>
     <!-- Modules -->
     <modules>
@@ -30,6 +39,7 @@
 			<plugin>
 				<groupId>com.microsoft.azure</groupId>
 				<artifactId>azure-webapp-maven-plugin</artifactId>
+                <inherited>true</inherited>
 				<version>1.9.1</version>
 				<configuration>
                     <skip>true</skip>

@@ -8,36 +8,39 @@ Building requires Java 1.8
 
 Run `mvn clean package -DskipTests`
 
-To run with tests, use
-
-Run `mvn clean package -Dserver.port=999`
-
 ## Deploying
 
 Deploying is similar to [deploying a spring boot application using maven](https://docs.microsoft.com/en-us/azure/developer/java/spring-framework/deploy-spring-boot-java-app-with-maven-plugin). Make sure you are logged in through the Azure cli and have the correct subscription set
 
-IMPORTANT: It is likely that the names for these services are already in use in azure
-
-For this reason, the following lines in the following files need to be changed before deploying:
-
-```yml
-discovery-server/pom.xml :
-  <appName>example-discovery-server</appName> -> <appName>[SOME_UNIQUE_IDENTIFIER]-example-discovery-server</appName>
-movie-catalog-service/pom.xml :
-  <appName>example-movie-catalog-service</appName> -> <appName>[SOME_UNIQUE_IDENTIFIER]-example-movie-catalog-service</appName>
-movie-catalog-service/src/main/resources/application.properties :
-  eureka.client.serviceUrl.defaultZone=https://example-discovery-server.azurewebsites.net:443/eureka -> eureka.client.serviceUrl.defaultZone=https://[SOME_UNIQUE_IDENTIFIER]-example-discovery-server.azurewebsites.net:443/eureka
-  eureka.instance.hostname=example-movie-catalog-service.azurewebsites.net -> eureka.instance.hostname=[SOME_UNIQUE_IDENTIFIER]-example-movie-catalog-service.azurewebsites.net
-movie-info-service/pom.xml :
-  <appName>example-movie-info-service</appName> -> <appName>[SOME_UNIQUE_IDENTIFIER]-example-movie-info-service</appName>
-movie-info-service/src/main/resources/application.properties :
-  eureka.client.serviceUrl.defaultZone=https://example-discovery-server.azurewebsites.net:443/eureka -> eureka.client.serviceUrl.defaultZone=https://[SOME_UNIQUE_IDENTIFIER]-example-discovery-server.azurewebsites.net:443/eureka
-  eureka.instance.hostname=example-movie-info-service.azurewebsites.net -> eureka.instance.hostname=[SOME_UNIQUE_IDENTIFIER]-example-movie-info-service.azurewebsites.net
-ratings-data-service/pom.xml :
-  <appName>example-ratings-data-service</appName> -> <appName>[SOME_UNIQUE_IDENTIFIER]-example-ratings-data-service</appName>
-ratings-data-service/src/main/resources/application.properties :
-  eureka.client.serviceUrl.defaultZone=https://example-discovery-server.azurewebsites.net:443/eureka -> eureka.client.serviceUrl.defaultZone=https://[SOME_UNIQUE_IDENTIFIER]-example-discovery-server.azurewebsites.net:443/eureka
-  eureka.instance.hostname=example-ratings-data-service.azurewebsites.net -> eureka.instance.hostname=[SOME_UNIQUE_IDENTIFIER]-example-ratings-data-service.azurewebsites.net
-```
-
 Then, run `mvn azure-webapp:deploy`
+
+To build and run the project in one command, use `mvn clean package azure-webapp:deploy -DskipTests`
+
+## The Service
+
+After deployment, the project will be hosted on four Azure webapps.
+
+These can be accessed at:
+
+- http://(TIMESTAMP)-discovery-server.azurewebsites.net/
+- http://(TIMESTAMP)-movie-catalog-service.azurewebsites.net/
+- http://(TIMESTAMP)-movie-info-service.azurewebsites.net/
+- http://(TIMESTAMP)-ratings-data-service.azurewebsites.net/
+
+Where (TIMESTAMP) is the automatically generated timestamp to ensure the webapps have a unique identifier.
+
+The URLS can be accessed either through the output of the maven command, or on the Azure portal under the new resource group `(TIMESTAMP)-example-springboot-microservices-rg`
+
+IMPORTANT: Ensure that you visit the discovery server first. This ensures that the services are able to register with it and discover each other. Then visit the movie info and ratings data services before querying the movie catalog service. This is because the movie catalog service requires data from the movie info service and ratings data service. Querying the movie catalog service first results in a 500 error.
+
+A powershell script which performs the requests in correct order:
+
+```powershell
+#Replace with your timestamp
+$timestamp=200408173336
+
+Invoke-Webrequest -URI https://$timestamp-discovery-server.azurewebsites.net
+Invoke-Webrequest -URI https://$timestamp-movie-info-service.azurewebsites.net
+Invoke-Webrequest -URI https://$timestamp-ratings-data-service.azurewebsites.net
+Invoke-Webrequest -URI https://$timestamp-movie-catalog-service.azurewebsites.net
+```

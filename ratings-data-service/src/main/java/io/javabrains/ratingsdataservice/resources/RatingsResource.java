@@ -7,15 +7,22 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-@RequestMapping("/ratingsdata")
+@RequestMapping("/")
 public class RatingsResource {
 
-    @RequestMapping("/movies/{movieId}")
+    @RequestMapping("/")
+    public String getServiceInfo(){
+        return "Ratings service is up!\n" +
+        "Ratings by movie can be requested on the path /ratingsdata/movies/{movieId}\n" +
+        "Ratings by user can be requested on the path /ratingsdata/user/{userId}";
+    }
+
+    @RequestMapping("/ratingsdata/movies/{movieId}")
     public Rating getMovieRating(@PathVariable("movieId") String movieId) {
         return new Rating(movieId, 4);
     }
 
-    @RequestMapping("/user/{userId}")
+    @RequestMapping("/ratingsdata/user/{userId}")
     public UserRating getUserRatings(@PathVariable("userId") String userId) {
         UserRating userRating = new UserRating();
         userRating.initData(userId);
